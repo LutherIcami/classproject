@@ -35,11 +35,14 @@ import com.ist.ondemand.presentation.MainViewModel
 import com.ist.ondemand.presentation.common.CheckSignedIn
 import com.ist.ondemand.presentation.common.ProgressSpinner
 
-
+/*
+* Add window soft input mode in ActivityManifest.xml
+* */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController, vm: MainViewModel) {
-CheckSignedIn(vm = vm, navController =navController)
+fun Servicescreen(navController: NavController, vm: MainViewModel) {
+    CheckSignedIn(vm = vm, navController = navController)
+
     val focus = LocalFocusManager.current
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -48,9 +51,11 @@ CheckSignedIn(vm = vm, navController =navController)
                 .wrapContentHeight()
                 .verticalScroll(
                     rememberScrollState()
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+                ), horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+
+            val usernameState = remember { mutableStateOf(TextFieldValue()) }
             val emailState = remember { mutableStateOf(TextFieldValue()) }
             val passState = remember { mutableStateOf(TextFieldValue()) }
 
@@ -63,13 +68,17 @@ CheckSignedIn(vm = vm, navController =navController)
                     .padding(8.dp)
             )
             Text(
-                text = "Login",
+                text = "Signup",
                 modifier = Modifier.padding(8.dp),
                 fontSize = 30.sp,
-                fontFamily = FontFamily.Serif
+                fontFamily = FontFamily.SansSerif
             )
-            OutlinedTextField(
-                value = emailState.value,
+
+            OutlinedTextField(value = usernameState.value,
+                onValueChange = { usernameState.value = it },
+                modifier = Modifier.padding(8.dp),
+                label = { Text(text = "Username") })
+            OutlinedTextField(value = emailState.value,
                 onValueChange = { emailState.value = it },
                 modifier = Modifier.padding(8.dp),
                 label = { Text(text = "Email") })
@@ -80,39 +89,32 @@ CheckSignedIn(vm = vm, navController =navController)
                 label = { Text(text = "Password") },
                 visualTransformation = PasswordVisualTransformation()
             )
+
+
             Button(
                 onClick = {
                     focus.clearFocus(force = true)
-                    vm.onLogin(emailState.value.text, passState.value.text)
-                },
-                modifier = Modifier.padding(8.dp)
+                    vm.onSignup(
+                        usernameState.value.text, emailState.value.text, passState.value.text
+                    )
+                }, modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = "LOGIN")
+                Text(text = "SIGN UP")
             }
-            Text(
-                text = "New here? Go to signup",
+            Text(text = "Already a user? Go to login ->",
                 color = Color.Blue,
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable {
-                        navController.navigate(Routes.Signup.route)
-                    }
-            )
-            Text(
-                text = "forgot password",
-                color = Color.Blue,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        navController.navigate(Routes.Signup.route)
-                    }
-            )
+                        navController.navigate(Routes.Login.route)
+                    })
         }
-
         val isLoading = vm.inProgress.value
         if (isLoading) {
             ProgressSpinner()
         }
     }
 
-}   
+}
+
+
